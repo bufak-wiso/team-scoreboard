@@ -17,4 +17,4 @@ jobs:
           script: |
              cd /var/www/team-scoreboard
              git pull
-             systemctl restart teamscoreboardapi.service 
+             sudo systemctl restart teamscoreboardapi.service 
