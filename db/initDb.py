@@ -69,10 +69,10 @@ def fill_testdata(conn):
     c_data=pd.DataFrame({"cId": [None, None], "name": ["Flunkyball", "Beerpong"]})
     c_data.to_sql('categories', con = conn, if_exists = 'append', index=False)
 
-    t_data=pd.DataFrame({"tId": [None, None, None, None], "name": ["FC Suffenhausen", "1.FC Partyborn", "Bufak Allstars", "Pong zur Bong"], "description": ["Nur der BVB!", "Partyborn, Junge!", "Wir wissen, wo es läuft!", "420"], "cId": [1,1,2,2], "pwd": ["111", "222", "333", "444"], "year": ["2022", "2022", "2022", "2022"]})
+    t_data=pd.DataFrame({"tId": [None, None, None, None, None], "name": ["FC Suffenhausen", "1.FC Partyborn", "Bufak Allstars", "Pong zur Bong", "Die fanstastischen Vier"], "description": ["Nur der BVB!", "Partyborn, Junge!", "Wir wissen, wo es läuft!", "420", "Wir bleiben TROY"], "cId": [1,1,2,2,1], "pwd": ["111", "222", "333", "444", "555"], "year": ["2022", "2022", "2022", "2022", "2022"]})
     t_data.to_sql('teams', con = conn, if_exists = 'append', index=False)
 
-    m_data=pd.DataFrame({"mId": [None, None], "cId": [1,2], "homeId": [1,3], "guestId": [2,4], "homeScore": [0,0], "guestScore": [1,1], "winnerId": [2,4]})
+    m_data=pd.DataFrame({"mId": [None, None, None, None, None], "cId": [1,2,1,1,1], "homeId": [1,3,2,2,5], "guestId": [2,4,1,1,2], "homeScore": [0,0,1,0,1], "guestScore": [1,1,0,1,0], "winnerId": [2,4,2,1,5]})
     m_data.to_sql('matches', con = conn, if_exists = 'append', index=False)
 
 if __name__ == "__main__":
