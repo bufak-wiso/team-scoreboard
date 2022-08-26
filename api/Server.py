@@ -68,7 +68,37 @@ def addMatchResults(cId, homeId, guestId, winnerId, homeScore, guestScore, homeP
     success = False
     msg = ""
     if cId and homeId and guestId and homePwd and guestPwd:
-        success = True
+
+        # check if correct password
+        # read password from db and compare with given password
+        cur = conn.cursor()
+        cur.execute("SELECT pwd FROM teams WHERE tid=?", (homeId,))
+        homePwd_db = cur.fetchone()[0]
+        cur.execute("SELECT pwd FROM teams WHERE tid=?", (guestId,))
+        guestPwd_db = cur.fetchone()[0]
+        cur.close()
+
+        if homePwd == homePwd_db:
+            if guestPwd == guestPwd_db:
+
+                # add match results to db
+
+                # old school approach
+                # conn.execute(f'''INSERT INTO TABLE matches
+                #         (mId, cId, homeId, guestId, homeScore, guestScore, winnerId, timestamp)
+                #         VALUES (NULL, {cId}, {homeId}, {guestId}, {homeScore}, {guestScore}, {winnerId}, CURRENT_TIMESTAMP)''')
+                # conn.commit()
+                
+                # new school approach   
+                data=pd.DataFrame({"mId": None, "cId": cId, "homeId": homeId, "guestId": guestId, "winnerId": winnerId, "homeScore": homeScore, "guestScore": guestScore})
+                data.to_sql('matches', con = conn, if_exists = 'append')
+
+                success = True
+            else:
+                msg = "Error: Wrong guest team password!"
+        else:
+            msg = "Error: Wrong home team password!"
+    
     return success, msg
 
 def getTeams():
@@ -99,4 +129,5 @@ def getScoreboard():
     return
 
 if __name__ == "__main__":
+    conn = sqlite3.connect(DB_FILENAME)
     serve(app, listen='*:7887', threads=1)
