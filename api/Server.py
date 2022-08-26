@@ -76,7 +76,7 @@ def get_teams_handler():
 @app.route("/add-team", methods=['POST'] )
 def add_team_handler():
 
-    request_data = loads(request.data.decode())
+    request_data = loads(request.data.decode(encoding="utf-8"))
     response_data = {}
     
     name = request_data.get("name")
@@ -169,8 +169,30 @@ def getTeams():
 
     return teams
 
-def getScoreboard():
-    return
+def getScoreboard(category=1):
+    '''
+    This function retrieves all the match data from the db and creates a sorted pandas df scoreboard showing only teams with a minimum of 5 completed matches 
+    '''
+    MIN_COMPLETED_MATCHES = 1
+    df_matches = pd.read_sql_query(f"SELECT * from matches where cId={category}", conn)#, index_col="mId")
+    df_teams = pd.read_sql_query(f"SELECT * from teams where cId={category}", conn)#, index_col="mId")
+    df_wins_per_team = df_matches.groupby('winnerId').agg({"winnerId": "count"})
+    df_wins_per_team.columns = ["wins"]
+    df_matches_per_team = pd.DataFrame(df_matches[["homeId", "guestId"]].stack().value_counts())
+    df_matches_per_team.columns = ["matches"]
+    df_matches_per_team_cleaned = df_matches_per_team[df_matches_per_team["matches"] > MIN_COMPLETED_MATCHES]
+    list_of_relevant_teams = df_matches_per_team_cleaned.index.values.tolist()
+    df_wins_per_team_cleaned = df_wins_per_team[df_wins_per_team.index.isin(list_of_relevant_teams)]
+    df_wins_per_team_cleaned.rename(columns={"winnerId": "tId", "winnerId": "wins"}, inplace=True)
+
+    scoreboard = df_wins_per_team_cleaned.join(df_matches_per_team)
+    scoreboard["W/L ratio"]= scoreboard["wins"] / scoreboard["matches"]
+    scoreboard.sort_values(by=["W/L ratio", "wins", "matches"], ascending=False, inplace=True)
+    scoreboard = pd.merge(df_teams[["tId", "name"]], scoreboard, how='right', left_on='tId', right_on = 'winnerId')
+    scoreboard.drop('tId', axis=1, inplace=True)
+    print("Loaded match data from db.")
+    # scoreboard = df.to_dict('records')
+    return scoreboard.to_dict('records')
 
 if __name__ == "__main__":
     conn = sqlite3.connect(DB_FILENAME, check_same_thread=False)
