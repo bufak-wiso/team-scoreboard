@@ -16,5 +16,5 @@ jobs:
           port: 22
           script: |
              cd /var/www/team-scoreboard
-             git pull
+             git reset --hard origin/main
              sudo systemctl restart teamscoreboardapi.service 
