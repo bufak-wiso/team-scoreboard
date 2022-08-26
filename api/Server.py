@@ -60,7 +60,7 @@ def add_match_handler():
     return resp
 
 # Gets all team data
-# Example Response Data: 
+# Example Response Data: {"teams": [{"tId": 1, "name": "FC Suffenhausen", "description": "Nur der BVB!", "cId": 1, "year": "2022"}, {"tId": 2, "name": "1.FC Partyborn", "description": "Partyborn, Junge!", "cId": 1, "year": "2022"}, {"tId": 3, "name": "Bufak Allstars", "description": "Wir wissen, wo es l\u00e4uft!", "cId": 2, "year": "2022"}, {"tId": 4, "name": "Pong zur Bong", "description": "420", "cId": 2, "year": "2022"}]}
 @app.route("/get-teams", methods=['GET'] )
 def get_teams_handler():
     response_data = {}
@@ -70,11 +70,43 @@ def get_teams_handler():
     body = dumps(response_data)
     resp = make_response(body)
     resp.headers["Access-Control-Allow-Origin"] = "*"
+    return resp
+
+# Example Response Data: {"name": "FC Suffenhausen", "description": "Nur der BVB!", "cId": 1, "year": "2022", "pwd": "Moin!"}
+@app.route("/add-team", methods=['POST'] )
+def add_team_handler():
+
+    request_data = loads(request.data.decode())
+    response_data = {}
+    
+    name = request_data.get("name")
+    description = request_data.get("description")
+    cId = request_data.get("cId")
+    year = request_data.get("year")
+    pwd = request_data.get("pwd")
+
+    success, msg = addTeam(name, description, cId, year, pwd)
+    response_data = {"success": success, "msg": msg}
+
+    body = dumps(response_data)
+    resp = make_response(body)
+    resp.headers["Access-Control-Allow-Origin"] = "*"
+    return resp
 
 ######### HELPERS #########
 
-def addTeam(name, description, cId, year):
-    return
+def addTeam(name, description, cId, year, pwd):
+    success = False
+    msg = ""
+    try:
+        # add data to db with pandas dataframe
+        df = pd.DataFrame({"tId": None, "name": name, "description": description, "cId": cId, "pwd": pwd, "year": year})
+        df.to_sql('teams', conn, if_exists='append', index=False)
+        success = True
+        msg = "Team successfully added!"
+    except Exception as e:
+        msg = "Error: " + str(e)
+    return success, msg
 
 def addMatchResults(cId, homeId, guestId, winnerId, homeScore, guestScore, homePwd, guestPwd):
     success = False
@@ -132,7 +164,7 @@ def getTeams():
     # cur.close()
 
     # Alternative with Pandas (Python-Love! *-*)
-    df = pd.read_sql_query("SELECT (tId, name, description, cId, year) from teams", conn)
+    df = pd.read_sql_query("SELECT tId, name, description, cId, year from teams", conn)
     teams = df.to_dict('records')
 
     return teams
@@ -141,5 +173,5 @@ def getScoreboard():
     return
 
 if __name__ == "__main__":
-    conn = sqlite3.connect(DB_FILENAME)
+    conn = sqlite3.connect(DB_FILENAME, check_same_thread=False)
     serve(app, listen='*:7887', threads=1)
