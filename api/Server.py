@@ -59,6 +59,18 @@ def add_match_handler():
     resp.headers["Access-Control-Allow-Origin"] = "*" # allow all origins (esp. for firefox cors problems)
     return resp
 
+# Gets all team data
+# Example Response Data: 
+@app.route("/get-teams", methods=['GET'] )
+def get_teams_handler():
+    response_data = {}
+    teams = getTeams()
+    response_data = {"teams": teams}
+
+    body = dumps(response_data)
+    resp = make_response(body)
+    resp.headers["Access-Control-Allow-Origin"] = "*"
+
 ######### HELPERS #########
 
 def addTeam(name, description, cId, year):
@@ -120,7 +132,7 @@ def getTeams():
     # cur.close()
 
     # Alternative with Pandas (Python-Love! *-*)
-    df = pd.read_sql_query("SELECT * from teams", conn)
+    df = pd.read_sql_query("SELECT (tId, name, description, cId, year) from teams", conn)
     teams = df.to_dict('records')
 
     return teams
