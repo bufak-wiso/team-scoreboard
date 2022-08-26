@@ -2,10 +2,10 @@
 
 import sqlite3
 import os
+import pandas as pd
 DB_FILENAME = "test.db"
 
-def init(wipeData=False):
-    conn = sqlite3.connect(DB_FILENAME)
+def init(conn, testdata=False, wipeData=False):
     print("Opened database successfully")
 
 
@@ -21,7 +21,7 @@ def init(wipeData=False):
                 description TEXT,
                 cId INTEGER,
                 pwd TEXT,
-                year INTEGER,
+                year TEXT,
                 FOREIGN KEY (cId) REFERENCES categories(cId)
                 )''')
 
@@ -43,11 +43,10 @@ def init(wipeData=False):
 
 
     print("Tables created successfully")
+    if testdata: fill_testdata(conn)
 
-    conn.close()
 
-
-def purge(hard=False):
+def purge(conn, hard=False):
     
     if hard:
         if os.path.isfile(DB_FILENAME):
@@ -56,15 +55,30 @@ def purge(hard=False):
         else:
             print("DB File not found.")
     else:
-        conn = sqlite3.connect(DB_FILENAME)
         conn.execute('''DROP TABLE IF EXISTS teams''') 
         conn.execute('''DROP TABLE IF EXISTS categories''')
         conn.execute('''DROP TABLE IF EXISTS matches''')
         print("Tables dropped successfully")
-        conn.close()
+        
+
+def fill_testdata(conn):
+    # insert into categories
+    # conn.execute('''INSERT INTO categories (cId, name)
+    #                 VALUES (NULL, "Test Category")''')
+
+    c_data=pd.DataFrame({"cId": [None, None], "name": ["Flunkyball", "Beerpong"]})
+    c_data.to_sql('categories', con = conn, if_exists = 'append', index=False)
+
+    t_data=pd.DataFrame({"tId": [None, None, None, None], "name": ["FC Suffenhausen", "1.FC Partyborn", "Bufak Allstars", "Pong zur Bong"], "description": ["Nur der BVB!", "Partyborn, Junge!", "Wir wissen, wo es läuft!", "420"], "cId": [1,1,2,2], "pwd": ["111", "222", "333", "444"], "year": ["2022", "2022", "2022", "2022"]})
+    t_data.to_sql('teams', con = conn, if_exists = 'append', index=False)
+
+    m_data=pd.DataFrame({"mId": [None, None], "cId": [1,2], "homeId": [1,3], "guestId": [2,4], "homeScore": [0,0], "guestScore": [1,1], "winnerId": [2,4]})
+    m_data.to_sql('matches', con = conn, if_exists = 'append', index=False)
 
 if __name__ == "__main__":
-    purge(hard=True)
-    init()
+    conn = sqlite3.connect(DB_FILENAME)
+    purge(conn, hard=False)
+    init(conn, testdata=True)
+    conn.close()
 
 
