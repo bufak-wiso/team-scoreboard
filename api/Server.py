@@ -4,7 +4,7 @@ from waitress import serve
 import sqlite3
 import pandas as pd
 
-DB_FILENAME = "test.db"
+DB_FILENAME = "/var/www/team-scoreboard/api/test.db"
 app = Flask(__name__)
 conn = sqlite3.connect(DB_FILENAME)
 
