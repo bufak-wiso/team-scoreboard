@@ -1,0 +1,7 @@
+[Unit]
+Description=API for Team Scoreboard
+After=multi-user.target
+[Service]
+Type=simple
+Restart=always                                                                                                                                                  ExecStart=/usr/bin/python3 /var/www/team-scoreboard/api/Server.py                                                                                               WorkingDirectory=/var/www/team-scoreboard/api                                                                                                                   [Install]
+WantedBy=multi-user.target
