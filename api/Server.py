@@ -100,7 +100,7 @@ def addTeam(name, description, cId, year, pwd):
     msg = ""
     try:
         # add data to db with pandas dataframe
-        df = pd.DataFrame({"tId": None, "name": name, "description": description, "cId": cId, "pwd": pwd, "year": year})
+        df = pd.DataFrame({"tId": [None], "name": [name], "description": [description], "cId": [cId], "pwd": [pwd], "year": [year]})
         df.to_sql('teams', conn, if_exists='append', index=False)
         success = True
         msg = "Team successfully added!"
@@ -134,7 +134,7 @@ def addMatchResults(cId, homeId, guestId, winnerId, homeScore, guestScore, homeP
                 # conn.commit()
                 
                 # new school approach   
-                data=pd.DataFrame({"mId": None, "cId": cId, "homeId": homeId, "guestId": guestId, "winnerId": winnerId, "homeScore": homeScore, "guestScore": guestScore})
+                data=pd.DataFrame({"mId": [None], "cId": [cId], "homeId": [homeId], "guestId": [guestId], "winnerId": [winnerId], "homeScore": [homeScore], "guestScore": [guestScore]})
                 data.to_sql('matches', con = conn, if_exists = 'append')
 
                 success = True
