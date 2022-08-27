@@ -6,7 +6,7 @@ import pandas as pd
 
 DB_FILENAME = "test.db"
 app = Flask(__name__)
-conn = sqlite3.connect(DB_FILENAME)
+conn = sqlite3.connect(DB_FILENAME, check_same_thread=False)
 
 @app.teardown_request
 def teardown_request_func(f):
@@ -37,6 +37,7 @@ def myrequest():
 
 # Accepts new match results
 # Example POST Data: {"cId": 1, "homeId": 23, "guestId": 3, "winnerId": 3, "homeScore": 0, "guestScore": 1, "homePwd": "fsr4ever", "guestPwd": "kekbert"}
+# Example Response: {"success": true, "msg": "Match results successfully added!"}
 @app.route("/add-match", methods=['POST'] )
 def add_match_handler():
     request_data = loads(request.data.decode())
@@ -72,7 +73,8 @@ def get_teams_handler():
     resp.headers["Access-Control-Allow-Origin"] = "*"
     return resp
 
-# Example Response Data: {"name": "FC Suffenhausen", "description": "Nur der BVB!", "cId": 1, "year": "2022", "pwd": "Moin!"}
+# Example Request Data: {"name": "FC Teststadt", "description": "Wer sind wir? Egal!", "cId": 1, "year": "2022", "pwd": "666"}
+# Example Response Data: {"success": true, "msg": "Team successfully added!"}
 @app.route("/add-team", methods=['POST'] )
 def add_team_handler():
 
@@ -116,10 +118,16 @@ def addMatchResults(cId, homeId, guestId, winnerId, homeScore, guestScore, homeP
         # check if correct password
         # read password from db and compare with given password
         cur = conn.cursor()
-        cur.execute("SELECT pwd FROM teams WHERE tid=?", (homeId,))
-        homePwd_db = cur.fetchone()[0]
-        cur.execute("SELECT pwd FROM teams WHERE tid=?", (guestId,))
-        guestPwd_db = cur.fetchone()[0]
+        try:
+            cur.execute("SELECT pwd FROM teams WHERE tid=?", (homeId,))
+            homePwd_db = cur.fetchone()[0]
+        except:
+            return False, "Error: No team with tId " + str(homeId) + " found!"
+        try:
+            cur.execute("SELECT pwd FROM teams WHERE tid=?", (guestId,))
+            guestPwd_db = cur.fetchone()[0]
+        except:
+            return False, "Error: No team with tId " + str(guestId) + " found!"
         cur.close()
 
         if homePwd == homePwd_db:
@@ -135,7 +143,7 @@ def addMatchResults(cId, homeId, guestId, winnerId, homeScore, guestScore, homeP
                 
                 # new school approach   
                 data=pd.DataFrame({"mId": [None], "cId": [cId], "homeId": [homeId], "guestId": [guestId], "winnerId": [winnerId], "homeScore": [homeScore], "guestScore": [guestScore]})
-                data.to_sql('matches', con = conn, if_exists = 'append')
+                data.to_sql('matches', con = conn, if_exists = 'append', index=False)
 
                 success = True
             else:
@@ -195,5 +203,4 @@ def getScoreboard(category=1):
     return scoreboard.to_dict('records')
 
 if __name__ == "__main__":
-    conn = sqlite3.connect(DB_FILENAME, check_same_thread=False)
     serve(app, listen='*:7887', threads=1)
