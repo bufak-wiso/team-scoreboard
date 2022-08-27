@@ -3,7 +3,7 @@
 import sqlite3
 import os
 import pandas as pd
-DB_FILENAME = "/var/www/team-scoreboard/api/test.db"
+DB_FILENAME = "test.db"
 
 def init(conn, testdata=False, wipeData=False):
     print("Opened database successfully")
