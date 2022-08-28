@@ -42,18 +42,20 @@ def myrequest():
 def add_match_handler():
     request_data = loads(request.data.decode())
     response_data = {}
-    
-    cId = request_data.get("cId")
-    homeId = request_data.get("homeId")
-    guestId = request_data.get("guestId")
-    winnerId = request_data.get("winnerId")
-    homeScore = request_data.get("homeScore", 1 if homeId == winnerId else 0)
-    guestScore = request_data.get("guestScore", 1 if guestId == winnerId else 0)
-    homePwd = request_data.get("homePwd")
-    guestPwd = request_data.get("guestPwd")
+    try:
+        cId = int(request_data.get("cId"))
+        homeId = int(request_data.get("homeId"))
+        guestId = int(request_data.get("guestId"))
+        winnerId = int(request_data.get("winnerId"))
+        homeScore = int(request_data.get("homeScore", 1 if homeId == winnerId else 0))
+        guestScore = int(request_data.get("guestScore", 1 if guestId == winnerId else 0))
+        homePwd = request_data.get("homePwd")
+        guestPwd = request_data.get("guestPwd")
 
-    success, msg = addMatchResults(cId, homeId, guestId, winnerId, homeScore, guestScore, homePwd, guestPwd)
-    response_data = {"success": success, "msg": msg}
+        success, msg = addMatchResults(cId, homeId, guestId, winnerId, homeScore, guestScore, homePwd, guestPwd)
+        response_data = {"success": success, "msg": msg}
+    except Exception as e:
+        response_data = {"success": False, "msg": "Error: " + str(e)}
 
     body = dumps(response_data)
     resp = make_response(body)
