@@ -41,6 +41,41 @@ function postGameRestult (apiUrl){
     });
 }
 
+function addTeamToTournament (apiUrl,year){
+    let team = {};
+    let formValues = jQuery(".formItem");
+    for (let i = 0; i<formValues.length;i++){
+        let value = jQuery(formValues[i]).val();
+        let key = jQuery(formValues[i]).attr("data-name");
+        team[key] = value;
+    };
+    team.cId=1;
+    team.year = year;
+    console.log(team)
+    let jsonString = JSON.stringify(team);
+    jQuery.ajax({
+        type: "POST",
+        url: apiUrl,
+        contentType: "application/json; charset=utf-8",
+        data: jsonString,
+        success : function(data){
+            jQuery("#success").addClass("hidden");
+            jQuery("#error").addClass("hidden");
+            response = JSON.parse(data);
+            if(response.success){
+                jQuery("#success").removeClass("hidden");
+                jQuery("#gameForm").addClass("hidden");
+            } else {
+                jQuery("#error .apiMessage").text(response.msg);
+                jQuery("#error").removeClass("hidden");
+            }
+        },
+        error : function(data){
+            console.log(data)
+        }
+    });
+}
+
 function changeWinnerOptions (){
     let el = jQuery(".formItem[data-name='winnerId']");
     jQuery(el).empty(); // remove old options
