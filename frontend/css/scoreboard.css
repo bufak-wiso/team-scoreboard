@@ -1,0 +1,63 @@
+.hidden{
+    display: none !important;
+}
+
+span#submitBtn {
+    float: right;
+    padding: 10px;
+    background-color: #e3f2fd;
+    border-radius: 10px;
+}
+span#submitBtn:hover {
+    cursor: pointer;
+    background-color: #90caf9;
+}
+div#success, div#error {
+    padding: 10px;
+    color: white;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+div#success{
+    background-color: #81c784;
+}
+
+div#error {
+    background-color: #e57373;
+}
+#error.apiMessage {
+    font-weight: 600;
+}
+
+.formLabel {
+    font-size: 20px;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.tableHeader,.tableItem  {
+    display: flex;
+    width: 100%;
+}
+
+.tableHeader div, .tableItem div {
+    width: 30%;
+}
+
+.tableHeader{
+    font-weight: 600;
+    text-decoration: underline;
+    margin-bottom: 8px;
+}
+
+.tableItem {
+    background-color: #e3f2fd;
+    padding: 5px;
+    margin-bottom: 4px;
+}
+
+.tableItem:nth-child(2n) {
+    background-color: #90caf9;
+}
+
