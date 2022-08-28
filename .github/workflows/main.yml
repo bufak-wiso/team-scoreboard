@@ -16,7 +16,7 @@ jobs:
           port: 22
           script: |
              cd /var/www/team-scoreboard
-             chown -R github .git/*
+             sudo chown -R github .git/*
              git fetch
              git pull
              sudo systemctl restart teamscoreboardapi.service 
