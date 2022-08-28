@@ -1,60 +1,47 @@
 <?php
-/*
-Plugin Name: Team Scoreboard Frontend
-Description: 
-Version: 1.0
-Author: Moritz Bunse 
-Author URI: https://github.com/bufak-wiso/team-scoreboard/
-*/
-defined( 'ABSPATH' ) or die( 'Are you ok?' );
+/**
+ * Plugin Name: teamscoreboard
+ * Plugin URI: https://github.com/bufak-wiso/team-scoreboard
+ * Description: BuFaK WiWi Scoreboard Plugin
+ * Version: 0.1
+ * Author: Moritz Bunse
+ * Author URI: https://mobunse.de
+ */
 
-$start_reminder = new UpdateReminder();
+require( plugin_dir_path( __FILE__ ) . '/includes/gameForm.php');
+require( plugin_dir_path( __FILE__ ) . '/includes/table.php');
+require( plugin_dir_path( __FILE__ ) . '/includes/regForm.php');
+ function teamscoreboard_plugin($atts) {
+		require( plugin_dir_path( __FILE__ ) . 'config.php');
 
-class UpdateReminder{
-
-	public function __construct() {
-
-		register_activation_hook( __FILE__, array( $this, 'updateReminder_activate' ) );
 		
-		register_deactivation_hook(__FILE__, array( $this, 'updateReminder_deactivation' ) );
-		
-		add_action( 'updateReminderEvent', array( $this, 'getUpdateStatus' ) );
+		// load js
+		wp_enqueue_script( 'catalog_functions', plugins_url( '/js/scoreboard.js', __FILE__ ));
+    
+		//load css
+		wp_register_style('scoreboard_style', plugins_url('/css/scoreboard.css',__FILE__ ), $ver="1.0");
+		wp_enqueue_style('scoreboard_style');
+	if($atts["pagetype"]=="form"){
+		$content = renderGameForm($apiServerUrl);
+	}elseif($atts["pagetype"]=="table"){
+		$content = renderTable($apiServerUrl);
+	}elseif($atts["pagetype"]=="regform"){
+		$content = renderRegForm($apiServerUrl,$gameYear);
 	}
 
-	public function getUpdateStatus(){
-
-		$status = wp_get_update_data();
-
-		if ( $status['counts']['total'] != 0 ) {
-			
-			$mail = get_option( 'admin_email' );
-			$blogname = get_option( 'blogname' );
-			
-			if ( $mail ) {
-				wp_mail(
-					$mail,
-					'Update Benachrichtigung ' . $blogname,
-					'Für deinen Blog "' . $blogname . '" stehen ' . $status['counts']['total'] . ' Updates zur Verfügung.<br>
-					' . $status['counts']['plugins'] . ' Plugin Updates<br>
-					' . $status['counts']['themes'] . ' Theme Updates</br>
-					' . $status['counts']['wordpress'] . ' WordPress Core Updates<br>
-					' . $status['counts']['translations'] . ' Übersetzungs Updates',
-					'Content-Type: text/html; charset=UTF-8'
-				);
-			}
-		}
-	}
-
-	public function updateReminder_activate(){
-		if (! wp_next_scheduled ( 'updateReminderEvent' )) {
-			wp_schedule_event( time(), 'daily', 'updateReminderEvent' );
-		}
-	}
-
-	public function updateReminder_deactivation(){
-		if ( wp_next_scheduled( 'updateReminderEvent' ) ) {
-			wp_clear_scheduled_hook( 'updateReminderEvent' );
-		}
-	}
-
+	return $content;
 }
+
+add_shortcode('teamscoreboard', 'teamscoreboard_plugin');
+
+function callApi($url){
+	return json_decode(file_get_contents($url),true);
+}
+function console_log( $data ){
+	echo '<script>';
+	echo 'console.log('. json_encode( $data ) .')';
+	echo '</script>';
+  }
+
+
+?>
