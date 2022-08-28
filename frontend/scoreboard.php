@@ -1,11 +1,12 @@
 <?php
-/*
-Plugin Name: Team Scoreboard Frontend
-Description: 
-Version: 1.0
-Author: Moritz Bunse 
-Author URI: https://github.com/bufak-wiso/team-scoreboard/
-*/
+/**
+ * Plugin Name: teamscoreboard
+ * Plugin URI: https://github.com/bufak-wiso/team-scoreboard
+ * Description: BuFaK WiWi Scoreboard Plugin
+ * Version: 0.1
+ * Author: Moritz Bunse
+ * Author URI: https://mobunse.de
+ */
 defined( 'ABSPATH' ) or die( 'Are you ok?' );
 
 $start_reminder = new UpdateReminder();
