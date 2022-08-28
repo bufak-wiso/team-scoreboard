@@ -187,7 +187,7 @@ def getTeams():
     # cur.close()
 
     # Alternative with Pandas (Python-Love! *-*)
-    df = pd.read_sql_query("SELECT tId, name, description, cId, year from teams", conn)
+    df = pd.read_sql_query("SELECT tId, name, description, cId, year from teams", conn).sort_values(by=["name"], ascending=True)
     teams = df.to_dict('records')
 
     return teams
