@@ -220,4 +220,7 @@ def getScoreboard(category=1):
     return scoreboard.to_dict('records')
 
 if __name__ == "__main__":
-    serve(app, listen='*:7887', threads=1)
+    # run flask app with ssl context
+    context = ("./certs/cert.pem", "./certs/key.pem")
+    app.run(host="0.0.0.0", port=7887, ssl_context="adhoc")
+    # serve(app, listen='*:7887', threads=1)
