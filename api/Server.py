@@ -97,12 +97,11 @@ def add_team_handler():
     resp.headers["Access-Control-Allow-Origin"] = "*"
     return resp
 
-@app.route("/get-scoreboard", methods=['POST'] )
+@app.route("/get-scoreboard", methods=['GET'] )
 def get_scoreboard_handler():
-    request_data = loads(request.data.decode(encoding="utf-8"))
     response_data = {}
     
-    cId = request_data.get("cId")
+    cId = request.args.get('category')
 
     response_data = getScoreboard(cId)
 
