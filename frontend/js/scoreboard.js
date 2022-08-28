@@ -16,7 +16,6 @@ function postGameRestult (apiUrl){
             match.guestScore = 1;
         }
     }
-    console.log(match)
     let jsonString = JSON.stringify(match);
     jQuery.ajax({
         type: "POST",
@@ -51,7 +50,6 @@ function addTeamToTournament (apiUrl,year){
     };
     team.cId=1;
     team.year = year;
-    console.log(team)
     let jsonString = JSON.stringify(team);
     jQuery.ajax({
         type: "POST",

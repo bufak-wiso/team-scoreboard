@@ -3,7 +3,6 @@ function renderTable($apiUrl){
 	$tableItems = "";
 	$items = callApi($apiUrl."/get-scoreboard?category=1");
 	for ($i = 0; $i<sizeof($items);$i++) {
-		console_log($items[$i]);
 		$count = $i+1;
 		$tableItems .= '<div class = "tableItem">'.
 							'<div>'.$count.'</div>'.
