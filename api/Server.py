@@ -8,6 +8,13 @@ DB_FILENAME = "test.db"
 app = Flask(__name__)
 conn = sqlite3.connect(DB_FILENAME, check_same_thread=False)
 
+# @app.before_request
+# def before_request():
+#     if not request.is_secure:
+#         url = request.url.replace('http://', 'https://', 1)
+#         code = 301
+#         return redirect(url, code=code)
+
 @app.teardown_request
 def teardown_request_func(f):
 
