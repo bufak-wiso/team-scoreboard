@@ -1,7 +1,7 @@
 <?php
 
 function renderGameForm ($apiUrl){
-	$teamList = callApi($apiUrl."/get-teams");
+	$teamList = callApi($apiUrl."/get-teams?cId=1");
 	$optionsHtml = "";
 	for ($i = 0;$i<sizeof($teamList["teams"]);$i++){
 		$team=$teamList["teams"][$i];
