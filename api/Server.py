@@ -1,4 +1,4 @@
-from flask import Flask,request,make_response
+from flask import Flask,request,make_response, redirect
 from json import loads, dumps
 from waitress import serve
 import sqlite3
@@ -74,7 +74,9 @@ def add_match_handler():
 @app.route("/get-teams", methods=['GET'] )
 def get_teams_handler():
     response_data = {}
-    teams = getTeams()
+
+    cId = request.args.get('cId', default = 0, type = int)
+    teams = getTeams(cId)
     response_data = {"teams": teams}
 
     body = dumps(response_data)
@@ -176,7 +178,7 @@ def addMatchResults(cId, homeId, guestId, winnerId, homeScore, guestScore, homeP
     
     return success, msg
 
-def getTeams():
+def getTeams(cId):
     teams = []
    
     # # Alternative Manual
@@ -196,8 +198,11 @@ def getTeams():
 
     # Alternative with Pandas (Python-Love! *-*)
     df = pd.read_sql_query("SELECT tId, name, description, cId, year from teams", conn).sort_values(by=["name"], ascending=True)
+    
+    # filter by category
+    if cId != 0:
+        df = df[df["cId"] == cId]
     teams = df.to_dict('records')
-
     return teams
 
 def getScoreboard(category=1):
