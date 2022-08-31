@@ -77,7 +77,7 @@ def fill_testdata(conn):
 
 if __name__ == "__main__":
     conn = sqlite3.connect(DB_FILENAME)
-    purge(conn, hard=True)
+    purge(conn, hard=False)
     init(conn, testdata=False)
     conn.close()
 
