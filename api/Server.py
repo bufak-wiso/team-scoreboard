@@ -209,14 +209,14 @@ def getScoreboard(category=1):
     '''
     This function retrieves all the match data from the db and creates a sorted pandas df scoreboard showing only teams with a minimum of 5 completed matches 
     '''
-    MIN_COMPLETED_MATCHES = 1
+    MIN_COMPLETED_MATCHES = 5
     df_matches = pd.read_sql_query(f"SELECT * from matches where cId={category}", conn)#, index_col="mId")
     df_teams = pd.read_sql_query(f"SELECT * from teams where cId={category}", conn)#, index_col="mId")
     df_wins_per_team = df_matches.groupby('winnerId').agg({"winnerId": "count"})
     df_wins_per_team.columns = ["wins"]
     df_matches_per_team = pd.DataFrame(df_matches[["homeId", "guestId"]].stack().value_counts())
     df_matches_per_team.columns = ["matches"]
-    df_matches_per_team_cleaned = df_matches_per_team[df_matches_per_team["matches"] > MIN_COMPLETED_MATCHES]
+    df_matches_per_team_cleaned = df_matches_per_team[df_matches_per_team["matches"] >= MIN_COMPLETED_MATCHES]
     list_of_relevant_teams = df_matches_per_team_cleaned.index.values.tolist()
     df_wins_per_team_cleaned = df_wins_per_team[df_wins_per_team.index.isin(list_of_relevant_teams)]
     df_wins_per_team_cleaned.rename(columns={"winnerId": "tId", "winnerId": "wins"}, inplace=True)
